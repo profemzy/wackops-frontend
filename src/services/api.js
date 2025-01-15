@@ -2,12 +2,12 @@ import axios from 'axios';
 
 const API_URL = 'https://backend.ops.infotitans.ca/api/v1';
 
-const api = axios.create({
+const axiosInstance = axios.create({
   baseURL: API_URL,
 });
 
 // Add token to requests
-api.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -15,29 +15,29 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export default {
+const api = {
   // Auth endpoints
   login(credentials) {
-    return api.post('/', credentials);
+    return axiosInstance.post('/', credentials);
   },
   logout() {
-    return api.delete('/');
+    return axiosInstance.delete('/');
   },
   register(userData) {
-    return api.post('/user', userData);
+    return axiosInstance.post('/user', userData);
   },
 
   // Research endpoints
   getResearch(username) {
-    return api.get(`/researches/?username=${username}`);
+    return axiosInstance.get(`/researches/?username=${username}`);
   },
   createResearch(question) {
-    return api.post('/researches/', { question });
+    return axiosInstance.post('/researches/', { question });
   },
 
   // User endpoints
   getUsers() {
-    return api.get('/user/');
+    return axiosInstance.get('/user/');
   },
 
   // Pusher authentication
@@ -45,6 +45,8 @@ export default {
     const formData = new FormData();
     formData.append('channel_name', channelName);
     formData.append('socket_id', socketId);
-    return api.post('/pusher', formData);
+    return axiosInstance.post('/pusher', formData);
   }
 };
+
+export default api;
